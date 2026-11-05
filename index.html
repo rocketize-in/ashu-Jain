@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Surprise! 💖</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1f0824, #120318);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 400px;
+            height: 100vh;
+            max-height: 840px;
+            background: linear-gradient(180deg, #ffb6c1, #ff8da1);
+            border-radius: 36px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 8px solid #2d1033;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 25px;
+            text-align: center;
+            background: linear-gradient(180deg, #ffb6c1, #ff8da1);
+            transition: opacity 0.3s ease-in-out;
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #b30047;
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+        }
+
+        p {
+            color: #4a1525;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .passcode-dots {
+            display: flex;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid #b30047;
+            background: transparent;
+            transition: 0.2s;
+        }
+
+        .dot.filled {
+            background: #b30047;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        .key-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #b30047;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: 0.1s;
+        }
+
+        .key-btn:active {
+            background: #b30047;
+            color: white;
+            transform: scale(0.92);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            position: relative;
+            width: 100%;
+            justify-content: center;
+            height: 50px;
+        }
+
+        .custom-btn {
+            background: #b30047;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(179, 0, 71, 0.4);
+            transition: 0.2s;
+            z-index: 15;
+        }
+
+        .custom-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-no {
+            background: #fff;
+            color: #b30047;
+            position: absolute;
+            transition: 0.15s ease-out;
+        }
+
+        .balloon-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0;
+            width: 100%;
+        }
+
+        .balloon {
+            width: 65px;
+            height: 80px;
+            background: #ff3366;
+            border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: inset -6px -6px 0px rgba(0,0,0,0.15), 0 5px 15px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .balloon.popped {
+            transform: scale(0);
+            opacity: 0;
+            transition: 0.3s ease;
+            pointer-events: none;
+        }
+
+        .cake-box {
+            font-size: 70px;
+            margin: 15px 0;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+            padding: 10px;
+        }
+
+        .flame {
+            font-size: 35px;
+            position: absolute;
+            top: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: flicker 0.4s infinite alternate;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+        }
+
+        .flame.out {
+            transform: translateX(-50%) scale(0) rotate(30deg);
+            opacity: 0;
+        }
+
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1); opacity: 1; }
+            100% { transform: translateX(-50%) scale(1.25); opacity: 0.8; }
+        }
+
+        .envelope {
+            width: 200px;
+            height: 130px;
+            background: #d63384;
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .letter-card {
+            background: white;
+            padding: 20px;
+            border-radius: 18px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 320px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .letter-text {
+            font-size: 1.05rem;
+            color: #444;
+            min-height: 70px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .gift-box {
+            font-size: 80px;
+            cursor: pointer;
+            margin: 15px 0;
+            animation: bounce 1s infinite alternate;
+        }
+
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-frame">
+        
+        <!-- STEP 1: Passcode Screen -->
+        <div id="screen-1" class="screen active">
+            <h1>🔒 Enter Passcode</h1>
+            <p>Something special is waiting for you<br><small style="color:#555;">(PIN is 2525)</small></p>
+            <div class="passcode-dots">
+                <div class="dot" id="dot-0"></div>
+                <div class="dot" id="dot-1"></div>
+                <div class="dot" id="dot-2"></div>
+                <div class="dot" id="dot-3"></div>
+            </div>
+            <div class="keypad">
+                <button class="key-btn" onclick="pressKey('1')">1</button>
+                <button class="key-btn" onclick="pressKey('2')">2</button>
+                <button class="key-btn" onclick="pressKey('3')">3</button>
+                <button class="key-btn" onclick="pressKey('4')">4</button>
+                <button class="key-btn" onclick="pressKey('5')">5</button>
+                <button class="key-btn" onclick="pressKey('6')">6</button>
+                <button class="key-btn" onclick="pressKey('7')">7</button>
+                <button class="key-btn" onclick="pressKey('8')">8</button>
+                <button class="key-btn" onclick="pressKey('9')">9</button>
+                <button class="key-btn" onclick="pressKey('0')">0</button>
+                <button class="key-btn" onclick="clearPIN()">⌫</button>
+            </div>
+        </div>
+
+        <!-- STEP 2 & 3: Greeting & Playful No Button -->
+        <div id="screen-2" class="screen">
+            <div style="font-size: 55px; margin-bottom: 8px;">🧸🎂</div>
+            <h1>Happy Birthday, Bestie!</h1>
+            <p>Are you excited for what's next?</p>
+            <div class="btn-group" id="btn-group">
+                <button class="custom-btn" onclick="nextScreen(3)">Yes</button>
+                <button class="custom-btn btn-no" id="no-btn" onmouseover="dodgeNo()" ontouchstart="dodgeNo()" onclick="dodgeNo()">No</button>
+            </div>
+        </div>
+
+        <!-- STEP 4: Pop All 4 Balloons Mini-Game -->
+        <div id="screen-3" class="screen">
+            <h1>🎈 Pop All 4 Balloons!</h1>
+            <p id="balloon-counter">Popped: 0 / 4</p>
+            <div class="balloon-container">
+                <div class="balloon" style="background:#ff3366;" onclick="popBalloon(this)">1</div>
+                <div class="balloon" style="background:#33cc66;" onclick="popBalloon(this)">2</div>
+                <div class="balloon" style="background:#3399ff;" onclick="popBalloon(this)">3</div>
+                <div class="balloon" style="background:#ff9933;" onclick="popBalloon(this)">4</div>
+            </div>
+        </div>
+
+        <!-- STEP 5: Virtual Candle Blowing with Animation -->
+        <div id="screen-4" class="screen">
+            <h1>Make a Wish! 🕯️</h1>
+            <p>Tap the candle flame to blow it out!</p>
+            <div class="cake-box" onclick="blowCandle()">
+                🎂
+                <div class="flame" id="candle-flame">🔥</div>
+            </div>
+            <p id="candle-status" style="font-style: italic; color: #4a1525;">(Tap the flame to blow it out)</p>
+        </div>
+
+        <!-- STEP 6 & 7: Rose Bouquet -->
+        <div id="screen-5" class="screen">
+            <h1>🌹 Forever Yours 🤍</h1>
+            <div style="font-size: 60px; margin: 8px 0;">💐</div>
+            <p>You make my world beautiful, you are my sunshine, and my favorite person ever! 💕</p>
+            <button class="custom-btn" onclick="nextScreen(6)">Open Message</button>
+        </div>
+
+        <!-- STEP 8: Envelope Surprise Reveal -->
+        <div id="screen-6" class="screen">
+            <h1>A Message From My Heart</h1>
+            <p>Tap the envelope to open</p>
+            <div class="envelope" onclick="nextScreen(7)">
+                💌 Tap to Open
+            </div>
+        </div>
+
+        <!-- STEP 9: Sentence-by-Sentence Letter Display -->
+        <div id="screen-7" class="screen">
+            <h1>Special Note 📜</h1>
+            <div class="letter-card">
+                <div class="letter-text" id="letter-sentence">Loading...</div>
+                <button class="custom-btn" style="padding: 8px 20px; font-size: 0.95rem;" onclick="nextLine()">Next ➔</button>
+            </div>
+        </div>
+
+        <!-- STEP 10: Final Gift Box Celebration -->
+        <div id="screen-8" class="screen">
+            <h1>Make a Wish Come True! 🌟</h1>
+            <div class="gift-box" onclick="openGift()">
+                🎁
+            </div>
+            <p id="final-msg" style="font-weight: bold; color: #b30047; font-size: 1.1rem;">Tap the gift box to unlock your surprise!</p>
+        </div>
+
+    </div>
+
+    <script>
+        let currentPIN = "";
+        const correctPIN = "2525";
+
+        function pressKey(num) {
+            if (currentPIN.length < 4) {
+                currentPIN += num;
+                updateDots();
+                if (currentPIN.length === 4) {
+                    if (currentPIN === correctPIN) {
+                        setTimeout(() => nextScreen(2), 200);
+                    } else {
+                        alert("Incorrect PIN! Try 2525");
+                        clearPIN();
+                    }
+                }
+            }
+        }
+
+        function clearPIN() {
+            currentPIN = "";
+            updateDots();
+        }
+
+        function updateDots() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i < currentPIN.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            }
+        }
+
+        function nextScreen(screenNum) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(`screen-${screenNum}`).classList.add('active');
+            if (screenNum === 7) {
+                showSentence(0);
+            }
+        }
+
+        function dodgeNo() {
+            const btn = document.getElementById('no-btn');
+            const x = (Math.random() - 0.5) * 140;
+            const y = (Math.random() - 0.5) * 60;
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        let poppedCount = 0;
+        function popBalloon(el) {
+            if (!el.classList.contains('popped')) {
+                el.classList.add('popped');
+                poppedCount++;
+                document.getElementById('balloon-counter').innerText = `Popped: ${poppedCount} / 4`;
+                if (poppedCount === 4) {
+                    setTimeout(() => nextScreen(5), 400);
+                }
+            }
+        }
+
+        let isBlown = false;
+        function blowCandle() {
+            if (isBlown) return;
+            isBlown = true;
+
+            const flame = document.getElementById('candle-flame');
+            flame.classList.add('out'); // Triggers the blow-out animation!
+            document.getElementById('candle-status').innerText = "✨ Wish Granted! ✨";
+
+            setTimeout(() => {
+                nextScreen(6);
+            }, 900);
+        }
+
+        const sentences = [
+            "Dear Bestie,",
+            "Happy Birthday to someone truly special! 🎂",
+            "You are a Sweet Soul, Super Loyal, My Rock,",
+            "and I'm so grateful to have you in my life.",
+            "You bring so much warmth and sweetness into my life.",
+            "Every moment with you is precious.",
+            "On your special day, I wish you all the happiness and love.",
+            "May this year bring you countless wonderful memories.",
+            "Here's to celebrating you today and always! 🎉",
+            "With love and best wishes,\nYour Special Someone 💝"
+        ];
+        let sentenceIndex = 0;
+
+        function showSentence(index) {
+            if (index < sentences.length) {
+                document.getElementById('letter-sentence').innerText = sentences[index];
+            } else {
+                nextScreen(8);
+            }
+        }
+
+        function nextLine() {
+            sentenceIndex++;
+            showSentence(sentenceIndex);
+        }
+
+        function openGift() {
+            document.querySelector('.gift-box').innerText = "🎉";
+            document.getElementById('final-msg').innerText = "Happy Birthday!! Wishing you the best day ever! 🥳🎈";
+        }
+    </script>
+</body>
+</html>
